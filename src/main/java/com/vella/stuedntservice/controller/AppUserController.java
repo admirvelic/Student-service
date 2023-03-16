@@ -20,55 +20,28 @@ public class AppUserController {
 
   @GetMapping("/{id}")
   public AppUser getAppUserById(@PathVariable Long id) throws CustomErrorException {
-    AppUser appUserData = appUserService.getAppUserById(id);
-    if (appUserData == null) {
-      log.error("Error fetching user");
-      throw new CustomErrorException(HttpStatus.NOT_FOUND, "App user not found");
-    }
-    return appUserData;
+    return appUserService.getAppUserById(id);
   }
 
   @PutMapping("/{id}/update")
-  public AppUser updateAppUser(@PathVariable Long id, @RequestBody AppUserCreateRequest request)
-      throws CustomErrorException {
-    try {
-      return appUserService.updateAppUser(id, request);
-    } catch (Exception e) {
-      log.error("Error updating appUser {}", e.getMessage());
-      throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-    }
+  public AppUser updateAppUser(@PathVariable Long id, @RequestBody AppUserCreateRequest request) throws CustomErrorException, IOException {
+    return appUserService.updateAppUser(id, request);
   }
 
   @PostMapping("/save")
-  public AppUser saveAppUser(@RequestBody AppUserCreateRequest request)
-      throws CustomErrorException {
-    try {
+  public AppUser saveAppUser(@RequestBody AppUserCreateRequest request) throws CustomErrorException {
       return appUserService.saveAppUser(request);
-    } catch (Exception e) {
-      log.error("Error crating new app user {}", e.getMessage());
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
-    }
   }
 
   @GetMapping("/all")
   public List<AppUser> getAllAppUser() throws CustomErrorException{
-    try{
     return appUserService.getAllAppUsers();
-    }catch (Exception e){
-      log.error("Error fetching all students");
-      throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-    }
     }
 
 
   @DeleteMapping("/{id}/delete")
   public String deleteAppUser(@PathVariable Long id) throws CustomErrorException {
-    try {
       appUserService.deleteAppUser(id);
-
       return "Successfully deleted app user with id " + id;
-    } catch (Exception e) {
-      throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-    }
   }
 }

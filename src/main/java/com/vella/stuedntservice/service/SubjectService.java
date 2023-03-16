@@ -1,6 +1,7 @@
 package com.vella.stuedntservice.service;
 
-import com.vella.stuedntservice.model.Subject;
+import com.vella.stuedntservice.controller.SubjectController;
+import com.vella.stuedntservice.model.Subject;import com.vella.stuedntservice.model.requests.SubjectCreateRequest;
 
 import java.io.IOException;
 import java.util.List;
@@ -11,9 +12,9 @@ public interface SubjectService {
 
   List<Subject> getAllSubjects();
 
-  Subject saveSubject(Subject subject);
+  Subject saveSubject(SubjectCreateRequest request);
 
-  Subject updateSubject(Long id, Subject subject) throws IOException;
+  Subject updateSubject(Long id, SubjectCreateRequest request) throws IOException;
 
   void deleteSubject(Long id);
 }

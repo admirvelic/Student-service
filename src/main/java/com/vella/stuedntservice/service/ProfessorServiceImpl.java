@@ -5,6 +5,7 @@ import com.vella.stuedntservice.model.SchoolClass;import com.vella.stuedntservic
 import com.vella.stuedntservice.repository.ProfessorRepo;
 import com.vella.stuedntservice.repository.SchoolClassRepo;import com.vella.stuedntservice.repository.SubjectRepo;import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,47 +17,67 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class ProfessorServiceImpl implements ProfessorService {private final SchoolClassRepo schoolClassRepo;private final SubjectRepo subjectRepo;
+public class ProfessorServiceImpl implements ProfessorService {
+  private final SchoolClassRepo schoolClassRepo;
+  private final SubjectRepo subjectRepo;
   private final ProfessorRepo professorRepo;
 
   public Professor getProfessorById(Long id) {
-    log.info("Fetching professor by id {}", id);
-    Optional<Professor> professor = professorRepo.findById(id);
-    if (professor.isEmpty()){
-      throw new CustomErrorException("Professor is missing");
+    try{
+      log.info("Fetching professor by id {}", id);
+      Optional<Professor> professor = professorRepo.findById(id);
+      if (professor.isEmpty()) {
+        throw new CustomErrorException("Professor is missing");
+      }
+      return professor.get();
+    } catch (Exception e) {
+      log.error("Error updating professor {}", e.getMessage());
+      throw new CustomErrorException(HttpStatus.NOT_FOUND, e.getMessage());
     }
-    return professor.get();
   }
 
   @Override
   public List<Professor> getAllProfessors() {
-    log.info("Fetching all professors");
-    return professorRepo.findAll();
+    try{
+      log.info("Fetching all professors");
+      return professorRepo.findAll();
+    }catch (Exception e) {
+      log.error("Error crating new professor {}", e.getMessage());
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
   }
   @Override
   public Professor saveProfessor(ProfessorCreateRequest request) {
-    if (request.getFirstName() == null) throw new IllegalArgumentException("Field 'first name' is missing.");
-    else if (request.getLastName() == null) throw new IllegalArgumentException("Field 'last name' is missing");
-    else if (request.getSubject() == null) throw new IllegalArgumentException("Field 'subject' is missing");
-    else if (request.getClass() == null)
-      throw new IllegalArgumentException("Field 'school class' is missing");
+    try{
+      if (request.getFirstName() == null)
+        throw new IllegalArgumentException("Field 'first name' is missing.");
+      else if (request.getLastName() == null)
+        throw new IllegalArgumentException("Field 'last name' is missing");
+      else if (request.getSubject() == null)
+        throw new IllegalArgumentException("Field 'subject' is missing");
+      else if (request.getClass() == null)
+        throw new IllegalArgumentException("Field 'school class' is missing");
 
-    Optional<Subject> subject = subjectRepo.findByName(request.getSubject());
-    if (subject.isEmpty()) {
-      throw new CustomErrorException("Subject not found");
-    }
-    Optional<SchoolClass> schoolClass = schoolClassRepo.findByName(request.getSchoolClass());
-    if (schoolClass.isEmpty()) {
-      throw new CustomErrorException("SchoolClass not found");
-    }
+      Optional<Subject> subject = subjectRepo.findByName(request.getSubject());
+      if (subject.isEmpty()) {
+        throw new CustomErrorException("Subject not found");
+      }
+      Optional<SchoolClass> schoolClass = schoolClassRepo.findByName(request.getSchoolClass());
+      if (schoolClass.isEmpty()) {
+        throw new CustomErrorException("SchoolClass not found");
+      }
 
-    Professor professor = new Professor();
-    professor.setFirstName(request.getFirstName());
-    professor.setLastName(request.getLastName());
-    professor.setSubject(subject.get());
-    professor.setSchoolClass(schoolClass.get());
-    log.info("Saving new professor {} to the database", professor.getId());
-    return professorRepo.save(professor);
+      Professor professor = new Professor();
+      professor.setFirstName(request.getFirstName());
+      professor.setLastName(request.getLastName());
+      professor.setSubject(subject.get());
+      professor.setSchoolClass(schoolClass.get());
+      log.info("Saving new professor {} to the database", professor.getId());
+      return professorRepo.save(professor);
+    }catch (Exception e) {
+      log.error("Error crating new professor {}", e.getMessage());
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
   }
 
   @Override
@@ -82,33 +103,42 @@ public class ProfessorServiceImpl implements ProfessorService {private final Sch
 
   @Override
   public Professor updateProfessor(Long id, ProfessorCreateRequest request) throws IOException {
-    log.info("Updating professor with id{}", id);
-    Optional<Professor> professorData = professorRepo.findById(id);
-    if (professorData.isEmpty())
-      throw new IOException("Could not fetch professor data with id" + id);
-    Professor professorDb = professorData.get();
-    if (request.getFirstName() != null) professorDb.setFirstName(request.getFirstName());
-    if (request.getLastName() != null) professorDb.setLastName(request.getLastName());
-    if (request.getSubject() != null) {
-      Optional<Subject> subject = subjectRepo.findByName(request.getSubject());
-      if(subject.isEmpty()){
-        throw new CustomErrorException("Subject is missing");
+    try{
+      log.info("Updating professor with id{}", id);
+      Optional<Professor> professorData = professorRepo.findById(id);
+      if (professorData.isEmpty())
+        throw new IOException("Could not fetch professor data with id" + id);
+      Professor professorDb = professorData.get();
+      if (request.getFirstName() != null) professorDb.setFirstName(request.getFirstName());
+      if (request.getLastName() != null) professorDb.setLastName(request.getLastName());
+      if (request.getSubject() != null) {
+        Optional<Subject> subject = subjectRepo.findByName(request.getSubject());
+        if (subject.isEmpty()) {
+          throw new CustomErrorException("Subject is missing");
+        }
+        professorDb.setSubject(subject.get());
       }
-      professorDb.setSubject(subject.get());
-    }
-    if (request.getClass() != null){
-      Optional<SchoolClass> schoolClass = schoolClassRepo.findByName(request.getSchoolClass());
-      if(schoolClass.isEmpty()){
-        throw new CustomErrorException("SchoolClass is missing");
+      if (request.getClass() != null) {
+        Optional<SchoolClass> schoolClass = schoolClassRepo.findByName(request.getSchoolClass());
+        if (schoolClass.isEmpty()) {
+          throw new CustomErrorException("SchoolClass is missing");
+        }
+        professorDb.setSchoolClass(schoolClass.get());
       }
-      professorDb.setSchoolClass(schoolClass.get());
+      return professorRepo.save(professorDb);
+    } catch (Exception e) {
+      log.error("Error updating professor {}", e.getMessage());
+      throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
-    return professorRepo.save(professorDb);
   }
 
   @Override
   public void deleteProfessor(Long id) {
-    log.info("Deleting professor with id {}", id);
-    professorRepo.deleteById(id);
+    try{
+      log.info("Deleting professor with id {}", id);
+      professorRepo.deleteById(id);
+    } catch (Exception e) {
+      throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
   }
 }

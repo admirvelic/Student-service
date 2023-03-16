@@ -1,7 +1,5 @@
 package com.vella.stuedntservice.model.requests;
 
-import com.vella.stuedntservice.model.Student;
-import com.vella.stuedntservice.model.Subject;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

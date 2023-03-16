@@ -10,8 +10,10 @@ import com.vella.stuedntservice.repository.StudentRepo;
 import com.vella.stuedntservice.repository.SubjectRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,10 +29,15 @@ public class GradesServiceImpl implements GradesService {
 
   @Override
   public Grades getGradesById(Long id) {
-    log.info("Fetching grades by id {}", id);
-    Optional<Grades> grades = gradesRepo.findById(id);
-    if (grades.isEmpty()) throw new CustomErrorException("Could not find grades with id {}" + id);
-    return grades.get();
+    try{
+      log.info("Fetching grades by id {}", id);
+      Optional<Grades> grades = gradesRepo.findById(id);
+      if (grades.isEmpty()) throw new CustomErrorException("Could not find grades with id {}" + id);
+      return grades.get();
+    }catch (Exception e){
+      log.error("Error fetching grade");
+      throw new CustomErrorException(HttpStatus.NOT_FOUND, "Grade not found");
+    }
   }
 
   @Override
@@ -47,28 +54,35 @@ public class GradesServiceImpl implements GradesService {
 
   @Override
   public Grades saveGrades(GradesCreateRequest request) {
-    Grades grades = new Grades();
-    grades.setGrade(request.getGrade());
-    Long studentId = request.getStudent();
-    Optional<Student> student = studentRepo.findById(studentId);
-    if (student.isEmpty()){
-      throw new CustomErrorException("Student is missing");
+    try{
+      Grades grades = new Grades();
+      grades.setGrade(request.getGrade());
+      Long studentId = request.getStudent();
+      Optional<Student> student = studentRepo.findById(studentId);
+      if (request.getGrade() == null) throw new CustomErrorException("Field 'grade' is missing.");
+      if (student.isEmpty()) {
+        throw new CustomErrorException("Student is missing");
+      }
+      grades.setStudent(student.get());
+      Optional<Subject> subject = subjectRepo.findByName(request.getSubject());
+      if (subject.isEmpty()) {
+        throw new CustomErrorException("Subject is missing");
+      }
+      grades.setSubject(subject.get());
+      log.info("Saving new grades {} to the database", grades.getId());
+      return gradesRepo.save(grades);
+    }catch (Exception e) {
+      log.error("Error crating new grades {}", e.getMessage());
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
-    grades.setStudent(student.get());
-    Optional<Subject> subject = subjectRepo.findByName(request.getSubject());
-    if (subject.isEmpty()){
-      throw new CustomErrorException("Subject is missing");
-    }
-    grades.setSubject(subject.get());
-    log.info("Saving new grades {} to the database", grades.getId());
-    return gradesRepo.save(grades);
   }
 
   @Override
   public Grades updateGrades(Long id, Grades grades) {
     log.info("Updating grades with id {}", id);
     Optional<Grades> gradesData = gradesRepo.findById(id);
-    if (gradesData.isEmpty()) throw new RuntimeException("Could not find grades data with id" + id);
+    if (gradesData.isEmpty())
+      throw new CustomErrorException("Could not find grades data with id" + id);
 
     Grades gradesDb = gradesData.get();
     if (grades.getId() != null) gradesDb.setId(grades.getId());
@@ -81,37 +95,46 @@ public class GradesServiceImpl implements GradesService {
 
   @Override
   public Grades updateGrades(Long id, GradesCreateRequest request) {
-    log.info("Updating grades with id {}", id);
-    Optional<Grades> grades = gradesRepo.findById(id);
-    if (grades.isEmpty()) {
-      throw new IllegalArgumentException("Could not find grades with id" + id);
-    }
-    if (request.getGrade() != null) grades.get().setGrade(request.getGrade());
-    if (request.getStudent() != null) {
-      Optional<Student> student = studentRepo.findById(request.getStudent());
-      if (student.isEmpty()) {
-        throw new IllegalArgumentException("Could not find student");
+    try{
+      log.info("Updating grades with id {}", id);
+      Optional<Grades> grades = gradesRepo.findById(id);
+      if (grades.isEmpty()) {
+        throw new IllegalArgumentException("Could not find grades with id" + id);
       }
-      grades.get().setStudent(student.get());
-    }
-    if (request.getSubject() != null) {
-      Optional<Subject> subject = subjectRepo.findByName(request.getSubject());
-      if (subject.isEmpty()) {
-        throw new IllegalArgumentException("Could not find subject");
+      if (request.getGrade() != null) grades.get().setGrade(request.getGrade());
+      if (request.getStudent() != null) {
+        Optional<Student> student = studentRepo.findById(request.getStudent());
+        if (student.isEmpty()) {
+          throw new IllegalArgumentException("Could not find student");
+        }
+        grades.get().setStudent(student.get());
       }
-      grades.get().setSubject(subject.get());
-    }
+      if (request.getSubject() != null) {
+        Optional<Subject> subject = subjectRepo.findByName(request.getSubject());
+        if (subject.isEmpty()) {
+          throw new IllegalArgumentException("Could not find subject");
+        }
+        grades.get().setSubject(subject.get());
+      }
 
-    return gradesRepo.save(grades.get());
+      return gradesRepo.save(grades.get());
+    }catch (Exception e) {
+      log.error("Error updating grades {}", e.getMessage());
+      throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
   }
 
   @Override
   public void deleteGrades(Long id) {
-    log.info("Deleting grades with id {}", id);
-    Optional<Grades> grades = gradesRepo.findById(id);
-    if (grades.isEmpty()) {
-      throw new IllegalArgumentException("Could not find grades");
+    try{
+      log.info("Deleting grades with id {}", id);
+      Optional<Grades> grades = gradesRepo.findById(id);
+      if (grades.isEmpty()) {
+        throw new IllegalArgumentException("Could not find grades");
+      }
+      gradesRepo.deleteById(id);
+    } catch (Exception e) {
+      throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
-    gradesRepo.deleteById(id);
   }
 }

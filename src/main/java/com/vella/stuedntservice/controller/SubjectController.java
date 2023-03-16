@@ -22,44 +22,17 @@ public class SubjectController {
 
   @GetMapping("/{id}")
   public Subject getSubjectId(@PathVariable Long id) throws CustomErrorException {
-    Subject subjectData = subjectService.getSubjectById(id);
-    if (subjectData == null)
-      throw new CustomErrorException(HttpStatus.NOT_FOUND, "Subject not found");
-
-    return subjectData;
+    return subjectService.getSubjectById(id);
   }
 
   @PutMapping("/{id}/update")
-  public Subject updeteSubject(@PathVariable Long id, @RequestBody Subject subject)
-      throws CustomErrorException {
-    Subject subjectData = subjectService.getSubjectById(id);
-    if (subject == null) throw new CustomErrorException(HttpStatus.NOT_FOUND, "Subject not found");
-
-    Subject subjectDb = subjectService.getSubjectById(id);
-
-    try {
-      return subjectService.updateSubject(id, subjectDb);
-    } catch (Exception e) {
-      log.error("Error updating subject {}", e.getMessage());
-      throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-    }
+  public Subject updeteSubject(@PathVariable Long id, @RequestBody SubjectCreateRequest request) throws CustomErrorException, IOException {
+      return subjectService.updateSubject(id, request);
   }
 
   @PostMapping("/save")
   public Subject saveSubject(@RequestBody SubjectCreateRequest request) throws CustomErrorException {
-
-    try {
-      if (request.getName() == null)
-        throw new IOException("Field 'name' is missing.");
-
-      Subject subject = new Subject();
-      subject.setName(request.getName());
-
-      return subjectService.saveSubject(subject);
-    } catch (Exception e) {
-      log.error("Error crating new subject {}", e.getMessage());
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
-    }
+      return subjectService.saveSubject(request);
   }
 
   @GetMapping("/all")
@@ -69,12 +42,7 @@ public class SubjectController {
 
   @DeleteMapping("/{id}/delete")
   public String deleteSubject(@PathVariable Long id) throws CustomErrorException {
-    try {
       subjectService.deleteSubject(id);
-
       return "Successfully deleted subject with id " + id;
-    } catch (Exception e) {
-      throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-    }
   }
 }

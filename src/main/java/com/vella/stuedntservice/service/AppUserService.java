@@ -13,7 +13,7 @@ public interface AppUserService {
 
   List<AppUser> getAllAppUsers();
 
-  AppUser saveAppUser(AppUser AppUser);
+  AppUser saveAppUser(AppUser appUser);
 
   AppUser saveAppUser(AppUserCreateRequest requestr);
 

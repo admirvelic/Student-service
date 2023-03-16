@@ -11,7 +11,7 @@ public interface SchoolClassService {
 
   List<SchoolClass> getAllSchoolClasses();
 
-  SchoolClass saveSchoolClass(SchoolClass schoolClass);
+  SchoolClass saveSchoolClass(SchoolClassCreateRequest request);
 
   SchoolClass updateSchoolClass(Long id, SchoolClass schoolClass) throws IOException;
   SchoolClass updateSchoolClass(Long id, SchoolClassCreateRequest request) throws IOException;

@@ -27,31 +27,17 @@ public class ProfessorController {
 
   @GetMapping("/{id}")
   public Professor getProfessorById(@PathVariable Long id) throws CustomErrorException {
-    Professor professorData = professorService.getProfessorById(id);
-    if (professorData == null) {
-      throw new CustomErrorException(HttpStatus.NOT_FOUND, "Professor not found");
-    }
-    return professorData;
+    return professorService.getProfessorById(id);
   }
 
   @PutMapping("/{id}/update")
-  public Professor updeteProfessor(@PathVariable Long id, @RequestBody ProfessorCreateRequest request) throws CustomErrorException {
-    try {
+  public Professor updeteProfessor(@PathVariable Long id, @RequestBody ProfessorCreateRequest request) throws CustomErrorException, IOException {
       return professorService.updateProfessor(id, request);
-    } catch (Exception e) {
-      log.error("Error updating professor {}", e.getMessage());
-      throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-    }
   }
 
   @PostMapping("/save")
   public Professor saveProfessor(@RequestBody ProfessorCreateRequest request) throws CustomErrorException {
-    try {
       return professorService.saveProfessor(request);
-    } catch (Exception e) {
-      log.error("Error crating new professor {}", e.getMessage());
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
-    }
   }
 
   @GetMapping("/all")
@@ -61,11 +47,7 @@ public class ProfessorController {
 
   @DeleteMapping("/{id}/delete")
   public String deleteProfessor(@PathVariable Long id) throws CustomErrorException {
-    try {
       professorService.deleteProfessor(id);
       return "Successfully deleted professor with id " + id;
-    } catch (Exception e) {
-      throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-    }
   }
 }

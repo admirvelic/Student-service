@@ -1,6 +1,6 @@
 package com.vella.stuedntservice.model.requests;
 
-import com.vella.stuedntservice.model.SchoolClass;import jakarta.persistence.JoinColumn;import jakarta.persistence.ManyToOne;import lombok.AllArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;

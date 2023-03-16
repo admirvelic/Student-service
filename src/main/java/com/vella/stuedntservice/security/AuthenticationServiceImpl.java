@@ -35,7 +35,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     return AuthenticationResponse.builder().token(jwt).build();
   }
 
-  public AuthenticationResponse authenticate(AuthenticationRequest request) throws Exception {
+  public AuthenticationResponse authenticate(AuthenticationRequest request)throws Exception  {
     authManager
         .authenticationManagerBean(config)
         .authenticate(

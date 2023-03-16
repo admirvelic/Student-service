@@ -1,9 +1,12 @@
 package com.vella.stuedntservice.service;
 
-import com.vella.stuedntservice.exception.CustomErrorException;import com.vella.stuedntservice.model.SchoolClass;
-import com.vella.stuedntservice.model.requests.SchoolClassCreateRequest;import com.vella.stuedntservice.repository.SchoolClassRepo;
+import com.vella.stuedntservice.exception.CustomErrorException;
+import com.vella.stuedntservice.model.SchoolClass;
+import com.vella.stuedntservice.model.requests.SchoolClassCreateRequest;
+import com.vella.stuedntservice.repository.SchoolClassRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,24 +22,39 @@ public class SchoolClassServiceImpl implements SchoolClassService {
   private final SchoolClassRepo schoolClassRepo;
 
   public SchoolClass getSchoolClassById(Long id) {
-    log.info("Fetching school class by id {}", id);
-    Optional<SchoolClass> schoolClass = schoolClassRepo.findById(id);
-    if (schoolClass.isEmpty()){
-      throw new CustomErrorException("SchoolClass is missing");
+    try {
+      log.info("Fetching school class by id {}", id);
+      Optional<SchoolClass> schoolClass = schoolClassRepo.findById(id);
+      if (schoolClass.isEmpty()) {
+        throw new CustomErrorException("SchoolClass is missing");
+      }
+      return schoolClass.get();
+    } catch (Exception e) {
+      throw new CustomErrorException(HttpStatus.NOT_FOUND, e.getMessage());
     }
-    return schoolClass.get();
   }
 
   @Override
   public List<SchoolClass> getAllSchoolClasses() {
-    log.info("Fetching all school classes");
-    return schoolClassRepo.findAll();
+    try {
+      log.info("Fetching all school classes");
+      return schoolClassRepo.findAll();
+    } catch (Exception e) {
+      throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
   }
 
   @Override
-  public SchoolClass saveSchoolClass(SchoolClass schoolClass) {
-    log.info("Saving new school class to the database");
-    return schoolClassRepo.save(schoolClass);
+  public SchoolClass saveSchoolClass(SchoolClassCreateRequest request) {
+    try {
+      SchoolClass schoolClass = new SchoolClass();
+      schoolClass.setName(request.getName());
+      log.info("Saving new school class to the database");
+      return schoolClassRepo.save(schoolClass);
+    } catch (Exception e) {
+      log.error("Error crating new school class {}", e.getMessage());
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
   }
 
   @Override
@@ -54,24 +72,31 @@ public class SchoolClassServiceImpl implements SchoolClassService {
   }
 
   @Override
-  public SchoolClass updateSchoolClass(Long id, SchoolClassCreateRequest request) throws IOException {
+  public SchoolClass updateSchoolClass(Long id, SchoolClassCreateRequest request)
+      throws IOException {
+    try {
+      log.info("Updating school class with id{}", id);
+      Optional<SchoolClass> schoolClassData = schoolClassRepo.findById(id);
+      if (schoolClassData.isEmpty())
+        throw new IOException("Could not fetch professor data with id" + id);
 
+      SchoolClass schoolClassDb = schoolClassData.get();
+      if (request.getName() != null) schoolClassDb.setName(request.getName());
 
-
-    log.info("Updating school class with id{}", id);
-    Optional<SchoolClass> schoolClassData = schoolClassRepo.findById(id);
-    if (schoolClassData.isEmpty())
-      throw new IOException("Could not fetch professor data with id" + id);
-
-    SchoolClass schoolClassDb = schoolClassData.get();
-    if (request.getName() != null) schoolClassDb.setName(request.getName());
-
-    return schoolClassRepo.save(schoolClassDb);
+      return schoolClassRepo.save(schoolClassDb);
+    } catch (Exception e) {
+      log.error("Error updating school class {}", e.getMessage());
+      throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
   }
 
   @Override
   public void deleteSchoolClass(Long id) {
-    log.info("Deleting school class with id {}", id);
-    schoolClassRepo.deleteById(id);
+    try {
+      log.info("Deleting school class with id {}", id);
+      schoolClassRepo.deleteById(id);
+    } catch (Exception e) {
+      throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
   }
 }
