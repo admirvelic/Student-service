@@ -3,15 +3,12 @@ package com.vella.stuedntservice.controller;
 import com.vella.stuedntservice.exception.CustomErrorException;
 import com.vella.stuedntservice.model.Subject;
 import com.vella.stuedntservice.model.requests.SubjectCreateRequest;
-import com.vella.stuedntservice.repository.SubjectRepo;
 import com.vella.stuedntservice.service.SubjectService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/subjects")
@@ -26,13 +23,15 @@ public class SubjectController {
   }
 
   @PutMapping("/{id}/update")
-  public Subject updeteSubject(@PathVariable Long id, @RequestBody SubjectCreateRequest request) throws CustomErrorException, IOException {
-      return subjectService.updateSubject(id, request);
+  public Subject updeteSubject(@PathVariable Long id, @RequestBody SubjectCreateRequest request)
+      throws CustomErrorException, IOException {
+    return subjectService.updateSubject(id, request);
   }
 
   @PostMapping("/save")
-  public Subject saveSubject(@RequestBody SubjectCreateRequest request) throws CustomErrorException {
-      return subjectService.saveSubject(request);
+  public Subject saveSubject(@RequestBody SubjectCreateRequest request)
+      throws CustomErrorException {
+    return subjectService.saveSubject(request);
   }
 
   @GetMapping("/all")
@@ -42,7 +41,7 @@ public class SubjectController {
 
   @DeleteMapping("/{id}/delete")
   public String deleteSubject(@PathVariable Long id) throws CustomErrorException {
-      subjectService.deleteSubject(id);
-      return "Successfully deleted subject with id " + id;
+    subjectService.deleteSubject(id);
+    return "Successfully deleted subject with id " + id;
   }
 }

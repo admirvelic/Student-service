@@ -3,13 +3,10 @@ package com.vella.stuedntservice.controller;
 import com.vella.stuedntservice.exception.CustomErrorException;
 import com.vella.stuedntservice.model.SchoolClass;
 import com.vella.stuedntservice.model.requests.SchoolClassCreateRequest;
-import com.vella.stuedntservice.repository.SchoolClassRepo;
 import com.vella.stuedntservice.service.SchoolClassService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
 import java.util.List;
 

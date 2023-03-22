@@ -6,7 +6,6 @@ import com.vella.stuedntservice.exception.CustomErrorException;
 import com.vella.stuedntservice.model.AppUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.*;
@@ -24,24 +23,25 @@ public class AppUserController {
   }
 
   @PutMapping("/{id}/update")
-  public AppUser updateAppUser(@PathVariable Long id, @RequestBody AppUserCreateRequest request) throws CustomErrorException, IOException {
+  public AppUser updateAppUser(@PathVariable Long id, @RequestBody AppUserCreateRequest request)
+      throws CustomErrorException, IOException {
     return appUserService.updateAppUser(id, request);
   }
 
   @PostMapping("/save")
-  public AppUser saveAppUser(@RequestBody AppUserCreateRequest request) throws CustomErrorException {
-      return appUserService.saveAppUser(request);
+  public AppUser saveAppUser(@RequestBody AppUserCreateRequest request)
+      throws CustomErrorException {
+    return appUserService.saveAppUser(request);
   }
 
   @GetMapping("/all")
-  public List<AppUser> getAllAppUser() throws CustomErrorException{
+  public List<AppUser> getAllAppUser() throws CustomErrorException {
     return appUserService.getAllAppUsers();
-    }
-
+  }
 
   @DeleteMapping("/{id}/delete")
   public String deleteAppUser(@PathVariable Long id) throws CustomErrorException {
-      appUserService.deleteAppUser(id);
-      return "Successfully deleted app user with id " + id;
+    appUserService.deleteAppUser(id);
+    return "Successfully deleted app user with id " + id;
   }
 }
