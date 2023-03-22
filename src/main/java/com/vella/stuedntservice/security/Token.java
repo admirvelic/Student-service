@@ -7,7 +7,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,20 +20,17 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Token {
 
-    @Id
-    @GeneratedValue
-    public Integer id;
+  @Id @GeneratedValue public Integer id;
 
-    @Column(unique = true)
-    public String token;
+  @Column(unique = true)
+  public String token;
 
-    @Enumerated(EnumType.STRING)
-    public TokenType tokenType = TokenType.BEARER;
+  @Enumerated(EnumType.STRING)
+  public TokenType tokenType = TokenType.BEARER;
 
-    public boolean revoked;
+  public boolean revoked;
 
-    public boolean expired;
+  public boolean expired;
 
-    @ManyToOne
-    public AppUser appUser;
+  @ManyToOne public AppUser appUser;
 }

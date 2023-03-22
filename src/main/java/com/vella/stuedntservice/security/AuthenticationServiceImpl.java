@@ -1,12 +1,12 @@
 package com.vella.stuedntservice.security;
 
+import com.vella.stuedntservice.exception.CustomErrorException;
 import com.vella.stuedntservice.model.enums.Role;
 import com.vella.stuedntservice.repository.AppUserRepo;
 import com.vella.stuedntservice.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import com.vella.stuedntservice.model.AppUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,20 +35,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     return AuthenticationResponse.builder().token(jwt).build();
   }
 
-  public AuthenticationResponse authenticate(AuthenticationRequest request)throws Exception  {
+  public AuthenticationResponse authenticate(AuthenticationRequest request) throws Exception {
     authManager
         .authenticationManagerBean(config)
         .authenticate(
             new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
     Optional<AppUser> appUser = appUserRepo.findByUsername(request.getUsername());
     var jwt = jwtService.generateToken(appUser);
+    if (appUser.isEmpty()) {
+      throw new CustomErrorException("appUser is empty");
+    }
     revokeAllUserTokens(appUser.get());
-    saveUserToken(appUser.get(),jwt);
+    saveUserToken(appUser.get(), jwt);
     return AuthenticationResponse.builder().token(jwt).build();
   }
 
   private void saveUserToken(AppUser user, String jwtToken) {
-    var token = Token.builder()
+    var token =
+        Token.builder()
             .appUser(user)
             .token(jwtToken)
             .tokenType(TokenType.BEARER)
@@ -57,14 +61,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             .build();
     tokenRepo.save(token);
   }
+
   private void revokeAllUserTokens(AppUser user) {
     var validUserTokens = tokenRepo.findAllValidTokenByUser(user.getId());
-    if (validUserTokens.isEmpty())
-      return;
-    validUserTokens.forEach(token -> {
-      token.setExpired(true);
-      token.setRevoked(true);
-    });
+    if (validUserTokens.isEmpty()) return;
+    validUserTokens.forEach(
+        token -> {
+          token.setExpired(true);
+          token.setRevoked(true);
+        });
     tokenRepo.saveAll(validUserTokens);
   }
 }

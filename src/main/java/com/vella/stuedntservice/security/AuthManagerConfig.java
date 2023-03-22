@@ -14,6 +14,4 @@ public class AuthManagerConfig {
       throws Exception {
     return config.getAuthenticationManager();
   }
-
-
 }
