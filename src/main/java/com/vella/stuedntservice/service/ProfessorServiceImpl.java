@@ -1,15 +1,19 @@
 package com.vella.stuedntservice.service;
 
-import com.vella.stuedntservice.exception.CustomErrorException;import com.vella.stuedntservice.model.Professor;
-import com.vella.stuedntservice.model.SchoolClass;import com.vella.stuedntservice.model.Subject;import com.vella.stuedntservice.model.requests.ProfessorCreateRequest;
+import com.vella.stuedntservice.exception.CustomErrorException;
+import com.vella.stuedntservice.model.Professor;
+import com.vella.stuedntservice.model.SchoolClass;
+import com.vella.stuedntservice.model.Subject;
+import com.vella.stuedntservice.model.requests.ProfessorCreateRequest;
 import com.vella.stuedntservice.repository.ProfessorRepo;
-import com.vella.stuedntservice.repository.SchoolClassRepo;import com.vella.stuedntservice.repository.SubjectRepo;import lombok.RequiredArgsConstructor;
+import com.vella.stuedntservice.repository.SchoolClassRepo;
+import com.vella.stuedntservice.repository.SubjectRepo;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.CharConversionException;import java.io.IOException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +27,7 @@ public class ProfessorServiceImpl implements ProfessorService {
   private final ProfessorRepo professorRepo;
 
   public Professor getProfessorById(Long id) {
-    try{
+    try {
       log.info("Fetching professor by id {}", id);
       Optional<Professor> professor = professorRepo.findById(id);
       if (professor.isEmpty()) {
@@ -38,17 +42,18 @@ public class ProfessorServiceImpl implements ProfessorService {
 
   @Override
   public List<Professor> getAllProfessors() {
-    try{
+    try {
       log.info("Fetching all professors");
       return professorRepo.findAll();
-    }catch (Exception e) {
+    } catch (Exception e) {
       log.error("Error crating new professor {}", e.getMessage());
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
   }
+
   @Override
   public Professor saveProfessor(ProfessorCreateRequest request) {
-    try{
+    try {
       if (request.getFirstName() == null)
         throw new IllegalArgumentException("Field 'first name' is missing.");
       else if (request.getLastName() == null)
@@ -74,7 +79,7 @@ public class ProfessorServiceImpl implements ProfessorService {
       professor.setSchoolClass(schoolClass.get());
       log.info("Saving new professor {} to the database", professor.getId());
       return professorRepo.save(professor);
-    }catch (Exception e) {
+    } catch (Exception e) {
       log.error("Error crating new professor {}", e.getMessage());
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
@@ -85,11 +90,13 @@ public class ProfessorServiceImpl implements ProfessorService {
     log.info("Saving new professor {} to the database", professor.getId());
     return professorRepo.save(professor);
   }
+
   @Override
   public Professor updateProfessor(Long id, Professor professor) throws IOException {
     log.info("Updating professor with id{}", id);
     Optional<Professor> professorData = professorRepo.findById(id);
-    if (professorData.isEmpty()) throw new IOException("Could not fetch professor data with id" + id);
+    if (professorData.isEmpty())
+      throw new IOException("Could not fetch professor data with id" + id);
 
     Professor professorDb = professorData.get();
     if (professor.getId() != null) professorDb.setId(professor.getId());
@@ -103,7 +110,7 @@ public class ProfessorServiceImpl implements ProfessorService {
 
   @Override
   public Professor updateProfessor(Long id, ProfessorCreateRequest request) throws IOException {
-    try{
+    try {
       log.info("Updating professor with id{}", id);
       Optional<Professor> professorData = professorRepo.findById(id);
       if (professorData.isEmpty())
@@ -134,7 +141,7 @@ public class ProfessorServiceImpl implements ProfessorService {
 
   @Override
   public void deleteProfessor(Long id) {
-    try{
+    try {
       log.info("Deleting professor with id {}", id);
       professorRepo.deleteById(id);
     } catch (Exception e) {

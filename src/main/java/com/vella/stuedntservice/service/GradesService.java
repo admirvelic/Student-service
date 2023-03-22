@@ -12,11 +12,12 @@ public interface GradesService {
   List<Grades> getAllGrades();
 
   Grades saveGrades(Grades grades);
+
   Grades saveGrades(GradesCreateRequest request);
 
   Grades updateGrades(Long id, Grades grades) throws IOException;
+
   Grades updateGrades(Long id, GradesCreateRequest request) throws IOException;
 
   void deleteGrades(Long id);
-
 }

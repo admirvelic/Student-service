@@ -18,6 +18,7 @@ public interface AppUserService {
   AppUser saveAppUser(AppUserCreateRequest requestr);
 
   AppUser updateAppUser(Long id, AppUser appUser) throws IOException;
+
   AppUser updateAppUser(Long id, AppUserCreateRequest request) throws IOException;
 
   void deleteAppUser(Long id);

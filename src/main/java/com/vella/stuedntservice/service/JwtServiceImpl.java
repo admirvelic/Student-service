@@ -1,6 +1,7 @@
 package com.vella.stuedntservice.service;
 
-import com.vella.stuedntservice.exception.CustomErrorException;import com.vella.stuedntservice.model.AppUser;
+import com.vella.stuedntservice.exception.CustomErrorException;
+import com.vella.stuedntservice.model.AppUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -11,12 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;import java.util.function.Function;
+import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -35,8 +36,9 @@ public class JwtServiceImpl implements JwtService {
   public String generateToken(UserDetails userDetails) {
     return generateToken(new HashMap<>(), userDetails);
   }
+
   public String generateToken(Optional<AppUser> appUser) {
-    if (appUser.isEmpty()){
+    if (appUser.isEmpty()) {
       throw new CustomErrorException("AppUser is missing");
     }
     return generateToken(new HashMap<>(), appUser.get());

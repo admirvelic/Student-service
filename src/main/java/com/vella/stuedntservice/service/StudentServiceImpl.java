@@ -13,9 +13,9 @@ import com.vella.stuedntservice.repository.StudentRepo;
 import com.vella.stuedntservice.repository.SubjectRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +31,7 @@ public class StudentServiceImpl implements StudentService {
   private final StudentRepo studentRepo;
 
   public Student getStudentById(Long id) {
-    try{
+    try {
       log.info("Fetching student by id {}", id);
       Optional<Student> student = studentRepo.findById(id);
       if (student.isEmpty()) {
@@ -39,18 +39,18 @@ public class StudentServiceImpl implements StudentService {
       }
       return student.get();
     } catch (Exception e) {
-    throw new CustomErrorException(HttpStatus.NOT_FOUND, e.getMessage());
-  }
+      throw new CustomErrorException(HttpStatus.NOT_FOUND, e.getMessage());
+    }
   }
 
   @Override
   public List<Student> getAllStudents() {
-    try{
+    try {
       log.info("Fetching all students");
       return studentRepo.findAll();
     } catch (Exception e) {
-    throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-  }
+      throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
   }
 
   @Override
@@ -86,7 +86,7 @@ public class StudentServiceImpl implements StudentService {
 
   @Override
   public Student updateStudent(Long id, StudentCreateRequest request) throws IOException {
-    try{
+    try {
       log.info("Updating student with id{}", id);
       Optional<Student> studentData = studentRepo.findById(id);
       if (studentData.isEmpty()) throw new IOException("Could not fetch student data with id" + id);
@@ -97,7 +97,7 @@ public class StudentServiceImpl implements StudentService {
       if (request.getDateOfBirth() != null) studentDb.setDateOfBirth(request.getDateOfBirth());
 
       return studentRepo.save(studentDb);
-    }catch (Exception e) {
+    } catch (Exception e) {
       log.error("Error updating student {}", e.getMessage());
       throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
@@ -105,17 +105,17 @@ public class StudentServiceImpl implements StudentService {
 
   @Override
   public void deleteStudent(Long id) {
-    try{
+    try {
       log.info("Deleting student with id {}", id);
       studentRepo.deleteById(id);
-    }catch (Exception e) {
+    } catch (Exception e) {
       throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 
   @Override
   public List<Grades> getGradesForStudentForSubject(Long id, SubjectCreateRequest request) {
-    try{
+    try {
       Optional<Student> student = studentRepo.findById(id);
       if (student.isEmpty()) {
         throw new ClassCastException("Student is missing");
@@ -125,7 +125,7 @@ public class StudentServiceImpl implements StudentService {
         throw new CustomErrorException("Subject is missing");
       }
       return gradesRepo.findByStudentAndSubject(student.get(), subject.get());
-    }catch (Exception e) {
+    } catch (Exception e) {
       log.error("Error crating new student {}", e.getMessage());
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
     }

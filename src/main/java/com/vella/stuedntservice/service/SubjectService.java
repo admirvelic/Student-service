@@ -1,7 +1,7 @@
 package com.vella.stuedntservice.service;
 
-import com.vella.stuedntservice.controller.SubjectController;
-import com.vella.stuedntservice.model.Subject;import com.vella.stuedntservice.model.requests.SubjectCreateRequest;
+import com.vella.stuedntservice.model.Subject;
+import com.vella.stuedntservice.model.requests.SubjectCreateRequest;
 
 import java.io.IOException;
 import java.util.List;

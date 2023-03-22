@@ -15,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,14 +31,14 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
 
   @Override
   public AppUser getAppUserById(Long id) {
-    try{
+    try {
       log.info("Fetching app user by id {}", id);
       Optional<AppUser> appUser = appUserRepo.findById(id);
       if (appUser.isEmpty()) {
         throw new CustomErrorException("AppUser not found");
       }
       return appUser.get();
-    }catch (Exception e) {
+    } catch (Exception e) {
       log.error("Error fetching appUser {}", e.getMessage());
       throw new CustomErrorException(HttpStatus.NOT_FOUND, e.getMessage());
     }
@@ -57,10 +56,10 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
 
   @Override
   public List<AppUser> getAllAppUsers() {
-    try{
+    try {
       log.info("Fetching all app user");
       return appUserRepo.findAll();
-    }catch (Exception e){
+    } catch (Exception e) {
       log.error("Error fetching all students");
       throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
@@ -75,7 +74,7 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
 
   @Override
   public AppUser saveAppUser(AppUserCreateRequest request) {
-    try{
+    try {
       if (request.getName() == null) throw new IllegalArgumentException("Field 'name' is missing");
       else if (request.getPassword() == null)
         throw new IllegalArgumentException("Field 'password' is missing");
@@ -90,7 +89,7 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
       log.info("Saving new app user {} to the database", appUser.getId());
       appUser.setPassword(passwordEncoder.passwordEncoder().encode(appUser.getPassword()));
       return appUserRepo.save(appUser);
-    }catch (Exception e) {
+    } catch (Exception e) {
       log.error("Error crating new app user {}", e.getMessage());
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
@@ -114,7 +113,7 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
 
   @Override
   public AppUser updateAppUser(Long id, AppUserCreateRequest request) {
-    try{
+    try {
       log.info("Updating app user with id {}", id);
       Optional<AppUser> appUserData = appUserRepo.findById(id);
       if (appUserData.isEmpty())
@@ -126,7 +125,7 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
       if (request.getPassword() != null) appUserDb.setPassword(request.getPassword());
 
       return appUserRepo.save(appUserDb);
-    }catch (Exception e) {
+    } catch (Exception e) {
       log.error("Error updating appUser {}", e.getMessage());
       throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
@@ -134,10 +133,10 @@ public class AppUserServiceImpl implements AppUserService, UserDetailsService {
 
   @Override
   public void deleteAppUser(Long id) {
-    try{
+    try {
       log.info("Deleting app user with id {}", id);
       appUserRepo.deleteById(id);
-    }catch (Exception e) {
+    } catch (Exception e) {
       throw new CustomErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
